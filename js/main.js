@@ -13,11 +13,11 @@ const canvasParams = {
 
 const colorsArray = ['red', 'purple', 'green', 'cyan', 'orange', 'yellow', 'blue','gray'];
 
-const maxColors = 8;
+let maxColors = 5;
 let canvas;
 let ctx;
 
-const grid = new Array(canvasParams.cellsCountX).fill(0).map(() => new Array(canvasParams.cellsCountY).fill(0));
+let grid;
 let neighborsArray = [];
 let neighborsArrayBuffer = [];
 
@@ -25,11 +25,21 @@ let neighborsArrayBuffer = [];
 (() => {
 	canvas = document.getElementById("main-canvas");
 	ctx = canvas.getContext("2d");
+	document.getElementById('cellsCountX').value = canvasParams.cellsCountX;
+	document.getElementById('cellsCountY').value = canvasParams.cellsCountY;
+	document.getElementById('maxColors').value = maxColors;
+	regenerate();
+})();
+
+function regenerate() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	neighborsArrayBuffer = [];
+	neighborsArray = [];
 	initCanvasParams();
 	initGrid();
 	checkNeibghbors();
 	highlightGrid();
-})();
+}
 
 function findSimalarNeighbor(x, y) {
 	let key;
@@ -85,8 +95,30 @@ function checkNeibghbors() {
 
 
 function initCanvasParams() {
+	const cellsCountX = +document.getElementById('cellsCountX').value;
+	const cellsCountY = +document.getElementById('cellsCountY').value;
+	if (document.getElementById('maxColors').value >  colorsArray.length || +document.getElementById('maxColors').value === 0) {
+		document.getElementById('maxColors').value = colorsArray.length;
+		maxColors = colorsArray.length;
+	} else {
+		maxColors = document.getElementById('maxColors').value;
+	}
+	if (cellsCountX === 0) {
+		document.getElementById('cellsCountX').value = canvasParams.cellsCountX;
+	} else {
+		canvasParams.cellsCountX = +document.getElementById('cellsCountX').value;
+	}
+	if (cellsCountY === 0) {
+		document.getElementById('cellsCountY').value = canvasParams.cellsCountY;
+	} else {
+		canvasParams.cellsCountY = +document.getElementById('cellsCountY').value;
+	}
+
 	canvasParams.cellSizeX = canvasParams.width / canvasParams.cellsCountX;
 	canvasParams.cellSizeY = canvasParams.width / canvasParams.cellsCountY;
+
+	grid = new Array(canvasParams.cellsCountX).fill(0).map(() => new Array(canvasParams.cellsCountY).fill(0));
+
 }
 
 function initGrid() {
@@ -97,13 +129,13 @@ function initGrid() {
 			ctx.fillStyle = colorsArray[grid[x][y]];
 			ctx.fillRect(x * canvasParams.cellSizeX, y * canvasParams.cellSizeY, canvasParams.cellSizeX, canvasParams.cellSizeY);
 
+			ctx.lineWidth = 2;
 			ctx.strokeStyle = 'white';
 			ctx.rect(x * canvasParams.cellSizeX, y * canvasParams.cellSizeY, canvasParams.cellSizeX, canvasParams.cellSizeY);
 			ctx.stroke();
 
 		}
 	}
-	console.log(grid);
 }
 
 function highlightGrid() {
